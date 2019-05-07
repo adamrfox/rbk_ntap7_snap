@@ -14,4 +14,14 @@ wrote if you like, or on its own.
 
 Syntax:
 
+<pre>
+Usage: rbk_ntap7_snap.py [-h] [-c creds] [-v] [-n name] ntap create|delete volume
+-h | --help : Prints this message
+-c | --creds= : Specify the credentials on the command line user:password or creds file
+-v | --verbose : Verbose Mode.  Prints more steps
+-n | --name= : Set name of the snapshot (rubrik by default)
+ntap : Name or IP of the NetApp
+create|delete : keyword to create or delete the snapshot
+volume : The volume of the snapshot
+</pre>
 
