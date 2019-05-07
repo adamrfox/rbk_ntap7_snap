@@ -12,7 +12,7 @@ def usage():
     sys.stderr.write("Usage: rbk_ntap7_snap.py [-h] [-c creds] [-v] [-n name] ntap create|delete volume\n")
     sys.stderr.write("-h | --help : Prints this message\n")
     sys.stderr.write("-c | --creds= : Specify the credentials on the command line user:password or creds file\n")
-    sys.stderr.write("-v | --verbose : Verbose Mode.  Prints more steps"\n")
+    sys.stderr.write("-v | --verbose : Verbose Mode.  Prints more steps\n")
     sys.stderr.write("-n | --name= : Set name of the snapshot (rubrik by default)\n")
     sys.stderr.write("ntap : Name or IP of the NetApp\n")
     sys.stderr.write("create|delete : keyword to create or delete the snapshot\n")
@@ -50,7 +50,6 @@ def get_creds_from_file (file):
 
 # SDK call to delete the snapshot.
 def ntap_delete_snap(netapp, volume, name):
-    print "Invoked delete!"
     ntap_snap = NaElement('snapshot-delete')
     ntap_snap.child_add_string("volume", volume)
     ntap_snap.child_add_string("snapshot", name)
@@ -87,7 +86,7 @@ if __name__ == '__main__':
 
     (ntap_addr, function, volume) = args
     if ntap_addr == "?":
-        usage())
+        usage()
 # Get NTAP creds
     if creds_file != "":
         (ntap_user, ntap_password) = get_creds_from_file(creds_file)
