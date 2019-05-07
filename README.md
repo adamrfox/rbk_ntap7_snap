@@ -12,4 +12,6 @@ but that can be changed on the command line.
 This script can be used along with the <a href="https://github.com/adamrfox/rbk_nas_backup"> pre/post script</a> I 
 wrote if you like, or on its own.
 
+Syntax:
+
 

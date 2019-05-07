@@ -84,9 +84,9 @@ if __name__ == '__main__':
         if opt in ('-n', '--name'):
             snap_name = a
 
-    (ntap_addr, function, volume) = args
-    if ntap_addr == "?":
+    if args[0] == "?":
         usage()
+    (ntap_addr, function, volume) = args
 # Get NTAP creds
     if creds_file != "":
         (ntap_user, ntap_password) = get_creds_from_file(creds_file)
