@@ -9,9 +9,17 @@ from NaServer import *
 
 
 def usage():
-    print "Usage goes here!"
+    sys.stderr.write("Usage: rbk_ntap7_snap.py [-h] [-c creds] [-v] [-n name] ntap create|delete volume\n")
+    sys.stderr.write("-h | --help : Prints this message\n")
+    sys.stderr.write("-c | --creds= : Specify the credentials on the command line user:password or creds file\n")
+    sys.stderr.write("-v | --verbose : Verbose Mode.  Prints more steps"\n")
+    sys.stderr.write("-n | --name= : Set name of the snapshot (rubrik by default)\n")
+    sys.stderr.write("ntap : Name or IP of the NetApp\n")
+    sys.stderr.write("create|delete : keyword to create or delete the snapshot\n")
+    sys.stderr.write("volume : The volume of the snapshot\n")
     exit (0)
 
+# SDK Error checking functions
 def ntap_set_err_check(out):
     if(out and (out.results_errno() != 0)) :
         r = out.results_reason()
@@ -23,6 +31,7 @@ def ntap_invoke_err_check(out):
             print(out.results_reason() + "\n")
             sys.exit(2)
 
+# Grabs teh credentials from a file.  Uses type 'ntap'
 def get_creds_from_file (file):
     with open(file) as fp:
         data = fp.read()
@@ -39,6 +48,7 @@ def get_creds_from_file (file):
             ntap_password = xs[2]
     return (ntap_user, ntap_password)
 
+# SDK call to delete the snapshot.
 def ntap_delete_snap(netapp, volume, name):
     print "Invoked delete!"
     ntap_snap = NaElement('snapshot-delete')
@@ -49,6 +59,7 @@ def ntap_delete_snap(netapp, volume, name):
     vprint("Deleted snaphot " + name + " on volume " + volume)
     return()
 
+# Verbose print
 def vprint(message):
     if verbose:
         print message
@@ -62,6 +73,7 @@ if __name__ == '__main__':
     creds_file = ""
     snap_name = "rubrik"
 
+# Parse arguments
     optlist, args = getopt.getopt(sys.argv[1:], 'hc:vn:', ['--help', '--creds=', '--verbose', '--name='])
     for opt, a in optlist:
         if opt in ('-h', '--help'):
@@ -74,13 +86,17 @@ if __name__ == '__main__':
             snap_name = a
 
     (ntap_addr, function, volume) = args
-
+    if ntap_addr == "?":
+        usage())
+# Get NTAP creds
     if creds_file != "":
         (ntap_user, ntap_password) = get_creds_from_file(creds_file)
     if ntap_user == "":
         ntap_user = raw_input("NTAP User: ")
     if ntap_password == "":
         ntap_password = getpass.getpass("NTAP Password: ")
+
+# Set up NetApp SDK
     netapp = NaServer(ntap_addr, 1, 15)
     out = netapp.set_transport_type('HTTP')
     ntap_set_err_check(out)
@@ -90,6 +106,8 @@ if __name__ == '__main__':
     ntap_set_err_check(out)
     out = netapp.set_admin_user(ntap_user, ntap_password)
     ntap_set_err_check(out)
+
+# Snap create process.  If snap exists, delete it first
     if function == "create":
         snap_api = NaElement('snapshot-list-info')
         snap_api.child_add_string('volume', volume)
@@ -103,11 +121,11 @@ if __name__ == '__main__':
         ntap_snap = NaElement('snapshot-create')
         ntap_snap.child_add_string("volume", volume)
         ntap_snap.child_add_string("snapshot", snap_name)
-        print "invoking create " + snap_name
         results = netapp.invoke_elem(ntap_snap)
-        print "Back from invoke"
         ntap_invoke_err_check(results)
         vprint ("Created snapshot " + snap_name + " on volume " + volume)
+
+# Snap delete process.  Simply calls the function
     elif function == "delete":
         ntap_delete_snap(netapp, volume, snap_name)
 
