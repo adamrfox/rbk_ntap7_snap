@@ -7,6 +7,7 @@ import getpass
 import time
 sys.path.append('./NetApp')
 from NaServer import *
+from codecs import decode,encode
 
 
 def usage():
@@ -32,14 +33,23 @@ def ntap_invoke_err_check(out):
             print(out.results_reason() + "\n")
             sys.exit(2)
 
-# Grabs teh credentials from a file.  Uses type 'ntap'
+# Grabs the credentials from a file.  Uses type 'ntap'
 def get_creds_from_file (file):
     with open(file) as fp:
         data = fp.read()
     fp.close()
-    data = data.decode('uu_codec')
-    data = data.decode('rot13')
-    lines = data.splitlines()
+#    data = data.decode('uu_codec')
+#    data = data.decode('rot13')
+    if int(sys.version[0]) > 2:
+        data = str.encode(data)
+        data = decode(data, 'uu')
+        data = decode(str(data), 'rot13')
+        data = data.replace("o'", "")
+        lines = data.split('\\a')
+    else:
+        data = decode(bytes(data), 'uu')
+        data = decode(data, 'rot13')
+        lines = data.splitlines()
     for x in lines:
         if x == "":
             continue
