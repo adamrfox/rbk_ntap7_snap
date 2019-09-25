@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+from __future__ import print_function
 import sys
 import getopt
 import getpass
@@ -61,7 +62,7 @@ def ntap_delete_snap(netapp, volume, name):
 # Verbose print
 def vprint(message):
     if verbose:
-        print message
+        print (message)
     return()
 
 if __name__ == '__main__':
@@ -91,7 +92,10 @@ if __name__ == '__main__':
     if creds_file != "":
         (ntap_user, ntap_password) = get_creds_from_file(creds_file)
     if ntap_user == "":
-        ntap_user = raw_input("NTAP User: ")
+        if int(sys.version[0]) < 3:
+            ntap_user = raw_input("NTAP User: ")
+        else:
+            ntap_user = input("NTAP User: ")
     if ntap_password == "":
         ntap_password = getpass.getpass("NTAP Password: ")
 
