@@ -1,9 +1,8 @@
 #!/usr/bin/python
 
-from codecs import encode
 import getpass
 import sys
-
+from codecs import encode, getdecoder
 
 user = {}
 passwd = {}
@@ -13,7 +12,7 @@ while True:
     if int(sys.version[0]) < 3:
         array = raw_input ("Enter Array type: (blank if done): ")
     else:
-        array = input("Enter Array type: (blank if done): ")
+        array = input("Enter Array type (blank if done): ")
     if array == "":
         break
     if int(sys.version[0]) < 3:
@@ -31,12 +30,11 @@ if int(sys.version[0]) < 3:
     data = data.encode('uu_codec')
     fp.write(data)
 else:
-    data = encode(data, 'rot13')
-    data = str.encode(data)
-    data = encode(data, 'uu')
-    data = str(data)
-    data = data.replace("b'", "")
-    lines = data.split("\\n")
-    for l in lines:
-        fp.write (l + "\n")
+    r13 = getdecoder('rot-13')
+    data = r13(data)[0]
+    data = encode(bytes(data, 'utf-8'), 'uu')
+    data = str(data)[2:len(str(data))-3]
+    data_s = str(data).split('\\n')
+    for line in data_s:
+        fp.write(line + '\n')
 fp.close()
